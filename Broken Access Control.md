@@ -33,13 +33,24 @@ _**// MISSING: $_SESSION['role']=$num['role'];**_
 
 **Impact:**
 
-- An authenticated attacker with low-level user privileges can gain complete administrative access to the application, view and modify all user data, escalate privileges, and compromise the entire system.
+- An authenticated attacker with student privileges can gain complete administrative access, view and modify all user data, manage courses, escalate privileges, and compromise the entire system.
 
 **Vulnerability Details:**
 -------------------------------------------------------------------------------------------------------------------------------------
 
 **Description:**
-A critical vulnerability has been found in Online Course Registration Application where the authorization mechanism fails to verify user roles before serving administrative content. The application only checks if a user is authenticated but does not verify their authorization level. Any authenticated user can access administrative functions by directly navigating to admin URLs (e.g., /onlinecourse/admin/user-log.php, /onlinecourse/admin/manage-students.php) without any role verification. This allows complete privilege escalation from regular user to administrator, enabling unauthorized access to sensitive data, user modification, and system compromise.
+A critical vulnerability has been found in PHP Gurukul Online Course Registration System v3.1 where the authorization mechanism fails to verify user roles before serving administrative content. The application only checks if a user is authenticated but does not verify their authorization level.
+
+The vulnerability exists in the session management implementation. The login process (index.php) creates session variables but omits role assignment:
+
+$_SESSION['login']=$_POST['regno'];
+$_SESSION['id']=$num['studentRegno'];  
+$_SESSION['sname']=$num['studentName'];
+// Missing: $_SESSION['role']=$num['role'];
+
+Any authenticated student can access administrative functions by directly navigating to admin URLs (e.g., /onlinecourse/admin/user-log.php, /onlinecourse/admin/manage-users.php) without role verification. This allows privilege escalation from student to administrator.
+
+An authenticated attacker with student privileges can gain complete administrative access, view and modify all user data, manage courses, escalate privileges, and compromise the entire system.
 
 **Vulnerable Code Example:**
 
@@ -89,8 +100,8 @@ The absence of role-based access control allows any authenticated user to:
 - Perform actions reserved for administrators
 
 **Affected Components**
-- User authentication system
-- Admin authentication system
+- All administrative functionality accessible without authorization (- /admin/semester.php - Full semester management including deletion capability)
+- Admin authentication system (SESSION, SEMESTER, DEPARTMENT, COURSE, REGISTRATION, MANAGE STUDENTS, ENROLL HISTORY, STUDENT LOGS, NEWS)
 - User deletion functionality
 
 **Remediation Recommendations**
